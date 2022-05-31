@@ -60,6 +60,7 @@ export default function applyMiddleware<Ext, S = any>(
 export default function applyMiddleware(
   ...middlewares: Middleware[]
 ): StoreEnhancer<any> {
+  //连续返回了两个函数，函数柯里化
   return (createStore: StoreEnhancerStoreCreator) =>
     <S, A extends AnyAction>(
       reducer: Reducer<S, A>,
@@ -69,15 +70,16 @@ export default function applyMiddleware(
       let dispatch: Dispatch = () => {
         throw new Error(
           'Dispatching while constructing your middleware is not allowed. ' +
-            'Other middleware would not be applied to this dispatch.'
+          'Other middleware would not be applied to this dispatch.'
         )
       }
-
+      // 传个了中间件getState和dispatch参数
       const middlewareAPI: MiddlewareAPI = {
         getState: store.getState,
         dispatch: (action, ...args) => dispatch(action, ...args)
       }
       const chain = middlewares.map(middleware => middleware(middlewareAPI))
+      // 被一层层的中间件加强了 最初始的store接收action作为参数，action必须是一个对象
       dispatch = compose<typeof dispatch>(...chain)(store.dispatch)
 
       return {

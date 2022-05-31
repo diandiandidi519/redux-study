@@ -39,6 +39,7 @@ import { kindOf } from './utils/kindOf'
  * @returns A Redux store that lets you read the state, dispatch actions
  * and subscribe to changes.
  */
+// 进行了函数重载
 export default function createStore<
   S,
   A extends Action,
@@ -74,8 +75,8 @@ export default function createStore<
   ) {
     throw new Error(
       'It looks like you are passing several store enhancers to ' +
-        'createStore(). This is not supported. Instead, compose them ' +
-        'together to a single function. See https://redux.js.org/tutorials/fundamentals/part-4-store#creating-a-store-with-enhancers for an example.'
+      'createStore(). This is not supported. Instead, compose them ' +
+      'together to a single function. See https://redux.js.org/tutorials/fundamentals/part-4-store#creating-a-store-with-enhancers for an example.'
     )
   }
 
@@ -135,8 +136,8 @@ export default function createStore<
     if (isDispatching) {
       throw new Error(
         'You may not call store.getState() while the reducer is executing. ' +
-          'The reducer has already received the state as an argument. ' +
-          'Pass it down from the top reducer instead of reading it from the store.'
+        'The reducer has already received the state as an argument. ' +
+        'Pass it down from the top reducer instead of reading it from the store.'
       )
     }
 
@@ -178,9 +179,9 @@ export default function createStore<
     if (isDispatching) {
       throw new Error(
         'You may not call store.subscribe() while the reducer is executing. ' +
-          'If you would like to be notified after the store has been updated, subscribe from a ' +
-          'component and invoke store.getState() in the callback to access the latest state. ' +
-          'See https://redux.js.org/api/store#subscribelistener for more details.'
+        'If you would like to be notified after the store has been updated, subscribe from a ' +
+        'component and invoke store.getState() in the callback to access the latest state. ' +
+        'See https://redux.js.org/api/store#subscribelistener for more details.'
       )
     }
 
@@ -197,7 +198,7 @@ export default function createStore<
       if (isDispatching) {
         throw new Error(
           'You may not unsubscribe from a store listener while the reducer is executing. ' +
-            'See https://redux.js.org/api/store#subscribelistener for more details.'
+          'See https://redux.js.org/api/store#subscribelistener for more details.'
         )
       }
 
@@ -292,7 +293,7 @@ export default function createStore<
     }
 
     // TODO: do this more elegantly
-    ;(currentReducer as unknown as Reducer<NewState, NewActions>) = nextReducer
+    ; (currentReducer as unknown as Reducer<NewState, NewActions>) = nextReducer
 
     // This action has a similar effect to ActionTypes.INIT.
     // Any reducers that existed in both the new and old rootReducer

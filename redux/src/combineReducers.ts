@@ -61,6 +61,7 @@ function getUnexpectedStateShapeWarningMessage(
 }
 
 function assertReducerShape(reducers: ReducersMapObject) {
+  // 所有的reducer进行初始化，默认触发INIT的action
   Object.keys(reducers).forEach(key => {
     const reducer = reducers[key]
     const initialState = reducer(undefined, { type: ActionTypes.INIT })
@@ -68,13 +69,13 @@ function assertReducerShape(reducers: ReducersMapObject) {
     if (typeof initialState === 'undefined') {
       throw new Error(
         `The slice reducer for key "${key}" returned undefined during initialization. ` +
-          `If the state passed to the reducer is undefined, you must ` +
-          `explicitly return the initial state. The initial state may ` +
-          `not be undefined. If you don't want to set a value for this reducer, ` +
-          `you can use null instead of undefined.`
+        `If the state passed to the reducer is undefined, you must ` +
+        `explicitly return the initial state. The initial state may ` +
+        `not be undefined. If you don't want to set a value for this reducer, ` +
+        `you can use null instead of undefined.`
       )
     }
-
+    // 随机的触发一个action
     if (
       typeof reducer(undefined, {
         type: ActionTypes.PROBE_UNKNOWN_ACTION()
@@ -82,11 +83,11 @@ function assertReducerShape(reducers: ReducersMapObject) {
     ) {
       throw new Error(
         `The slice reducer for key "${key}" returned undefined when probed with a random type. ` +
-          `Don't try to handle '${ActionTypes.INIT}' or other actions in "redux/*" ` +
-          `namespace. They are considered private. Instead, you must return the ` +
-          `current state for any unknown actions, unless it is undefined, ` +
-          `in which case you must return the initial state, regardless of the ` +
-          `action type. The initial state may not be undefined, but can be null.`
+        `Don't try to handle '${ActionTypes.INIT}' or other actions in "redux/*" ` +
+        `namespace. They are considered private. Instead, you must return the ` +
+        `current state for any unknown actions, unless it is undefined, ` +
+        `in which case you must return the initial state, regardless of the ` +
+        `action type. The initial state may not be undefined, but can be null.`
       )
     }
   })
@@ -123,6 +124,7 @@ export default function combineReducers<M extends ReducersMapObject>(
   ActionFromReducersMapObject<M>
 >
 export default function combineReducers(reducers: ReducersMapObject) {
+  // 获取所有的reducer的keys
   const reducerKeys = Object.keys(reducers)
   const finalReducers: ReducersMapObject = {}
   for (let i = 0; i < reducerKeys.length; i++) {
@@ -134,6 +136,7 @@ export default function combineReducers(reducers: ReducersMapObject) {
       }
     }
 
+    // 必须是一个函数，否则会被过滤掉
     if (typeof reducers[key] === 'function') {
       finalReducers[key] = reducers[key]
     }
@@ -153,7 +156,9 @@ export default function combineReducers(reducers: ReducersMapObject) {
   } catch (e) {
     shapeAssertionError = e
   }
-
+  // 返回一个函数 finalReducers一直留在内存里面
+  // state代表全局的状态
+  // action代表触发
   return function combination(
     state: StateFromReducersMapObject<typeof reducers> = {},
     action: AnyAction
@@ -177,23 +182,28 @@ export default function combineReducers(reducers: ReducersMapObject) {
     let hasChanged = false
     const nextState: StateFromReducersMapObject<typeof reducers> = {}
     for (let i = 0; i < finalReducerKeys.length; i++) {
+      //老的reducer对应的key
       const key = finalReducerKeys[i]
+      // 老的reducer函数
       const reducer = finalReducers[key]
+      // 当前key对应的的state
       const previousStateForKey = state[key]
+      // 获取触发action以后对应的state
       const nextStateForKey = reducer(previousStateForKey, action)
       if (typeof nextStateForKey === 'undefined') {
         const actionType = action && action.type
         throw new Error(
-          `When called with an action of type ${
-            actionType ? `"${String(actionType)}"` : '(unknown type)'
+          `When called with an action of type ${actionType ? `"${String(actionType)}"` : '(unknown type)'
           }, the slice reducer for key "${key}" returned undefined. ` +
-            `To ignore an action, you must explicitly return the previous state. ` +
-            `If you want this reducer to hold no value, you can return null instead of undefined.`
+          `To ignore an action, you must explicitly return the previous state. ` +
+          `If you want this reducer to hold no value, you can return null instead of undefined.`
         )
       }
       nextState[key] = nextStateForKey
+      // 对比前后的状态看下有没有改变，浅比较并且是全等
       hasChanged = hasChanged || nextStateForKey !== previousStateForKey
     }
+    // 只要有一个state不相等，或者前后的key个数不等，就是改变了
     hasChanged =
       hasChanged || finalReducerKeys.length !== Object.keys(state).length
     return hasChanged ? nextState : state

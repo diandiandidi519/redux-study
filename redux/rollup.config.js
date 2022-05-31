@@ -24,7 +24,7 @@ export default defineConfig([
   // CommonJS
   {
     input: 'src/index.ts',
-    output: { file: 'lib/redux.js', format: 'cjs', indent: false },
+    output: { file: 'lib/redux.js', format: 'cjs', indent: false, sourcemap: true, },
     external,
     plugins: [
       nodeResolve({
@@ -45,7 +45,7 @@ export default defineConfig([
   // ES
   {
     input: 'src/index.ts',
-    output: { file: 'es/redux.js', format: 'es', indent: false },
+    output: { file: 'es/redux.js', format: 'es', indent: false, sourcemap: true, },
     external,
     plugins: [
       nodeResolve({
@@ -69,7 +69,7 @@ export default defineConfig([
   // ES for Browsers
   {
     input: 'src/index.ts',
-    output: { file: 'es/redux.mjs', format: 'es', indent: false },
+    output: { file: 'es/redux.mjs', format: 'es', indent: false, sourcemap: true, },
     plugins: [
       nodeResolve({
         extensions
@@ -103,7 +103,7 @@ export default defineConfig([
       file: 'dist/redux.js',
       format: 'umd',
       name: 'Redux',
-      indent: false
+      indent: false, sourcemap: true,
     },
     plugins: [
       nodeResolve({
@@ -130,7 +130,8 @@ export default defineConfig([
       file: 'dist/redux.min.js',
       format: 'umd',
       name: 'Redux',
-      indent: false
+      indent: false,
+      sourcemap: true,
     },
     plugins: [
       nodeResolve({
